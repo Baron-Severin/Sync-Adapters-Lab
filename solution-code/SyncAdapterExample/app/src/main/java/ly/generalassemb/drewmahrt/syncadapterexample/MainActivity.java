@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         mArticlesListView = (ListView)findViewById(R.id.articles_list);
 
         Cursor cursor = getContentResolver().query(NewsContentProvider.CONTENT_URI,null,null,null,null);
-        mCursorAdapter = new SimpleCursorAdapter(this,android.R.layout.simple_list_item_1,cursor,new String[]{"title"},new int[]{android.R.id.text1},0);
+        mCursorAdapter = new SimpleCursorAdapter(this,R.layout.list_item,cursor,new String[]{"subreddit", "url", "score", "title"},new int[]{R.id.tvSubreddit, R.id.tvUrl, R.id.tvScore, R.id.tvTitle},0);
 
         mArticlesListView.setAdapter(mCursorAdapter);
 

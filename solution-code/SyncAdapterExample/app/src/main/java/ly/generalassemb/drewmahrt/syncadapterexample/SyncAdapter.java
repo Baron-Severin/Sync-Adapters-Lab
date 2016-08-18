@@ -11,6 +11,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,6 +22,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import ly.generalassemb.drewmahrt.syncadapterexample.Model.RedditObject;
 
 /**
  * Created by drewmahrt on 3/2/16.
@@ -66,7 +72,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         String data ="";
         try {
-            URL url = new URL("http://api.nytimes.com/svc/news/v3/content/all/all/all.json?limit=20&api-key=d1934738c85789ae6e8dac61ddca1abc%3A12%3A74602111");
+            URL url = new URL("https://www.reddit.com/r/random/.json?limit=20");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();
             InputStream inStream = connection.getInputStream();
@@ -76,13 +82,32 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         }
 
         Gson gson = new Gson();
-        SearchResult result = gson.fromJson(data,SearchResult.class);
+//        SearchResult result = gson.fromJson(data,SearchResult.class);
+        JsonObject jsonObject = gson.fromJson(data, JsonObject.class);
+        JsonArray redditArray = jsonObject.getAsJsonObject("data").getAsJsonArray("children");
 
-        for (int i = 0; i < result.getResults().size(); i++) {
+//        for (int i = 0; i < result.getResults().size(); i++) {
+//            ContentValues values = new ContentValues();
+//            values.put("title",result.getResults().get(i).getTitle());
+//            mContentResolver.insert(NewsContentProvider.CONTENT_URI,values);
+//            Log.d(TAG,"Latest story: "+result.getResults().get(i).getTitle());
+//        }
+        for (int i = 0; i < redditArray.size(); i++) {
             ContentValues values = new ContentValues();
-            values.put("title",result.getResults().get(i).getTitle());
+            JsonObject redditData = redditArray.get(i).getAsJsonObject().getAsJsonObject("data");
+
+            int score = redditData.getAsJsonPrimitive("score").getAsInt();
+            String subreddit = redditData.getAsJsonPrimitive("subreddit").getAsString();
+            String url = redditData.getAsJsonPrimitive("url").getAsString();
+            String title = redditData.getAsJsonPrimitive("title").getAsString();
+
+            values.put("score", score);
+            values.put("subreddit", subreddit);
+            values.put("url", url);
+            values.put("title", title);
+
             mContentResolver.insert(NewsContentProvider.CONTENT_URI,values);
-            Log.d(TAG,"Latest story: "+result.getResults().get(i).getTitle());
+//            Log.d(TAG,"Latest story: "+redditArray.get(i).getAsString());
         }
     }
 

@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class NewsDBHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "newsDB.db";
     public static final String TABLE_ARTICLES = "articles";
 
@@ -26,10 +26,14 @@ public class NewsDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_PRODUCTS_TABLE = "CREATE TABLE " +
                 TABLE_ARTICLES + "("
-                + COLUMN_ID + " INTEGER PRIMARY KEY," + COLUMN_TITLE
-                + " TEXT)";
+                + COLUMN_ID + " INTEGER PRIMARY KEY,"
+                + " score INTEGER," +
+                " subreddit TEXT," +
+                " title TEXT," +
+                " url TEXT)";
         db.execSQL(CREATE_PRODUCTS_TABLE);
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -44,7 +48,11 @@ public class NewsDBHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getAllArticles() {
-        String[] projection = {COLUMN_ID, COLUMN_TITLE};
+        String[] projection = {COLUMN_ID, "score", "subreddit", "url", "title"};
+//        values.put("score", score);
+//        values.put("subreddit", subreddit);
+//        values.put("url", url);
+
 
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(TABLE_ARTICLES,projection,null,null,null,null,null);
